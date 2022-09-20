@@ -2,8 +2,7 @@
 
 namespace frontend\controllers;
 
-use frontend\models\ResendVerificationEmailForm;
-use frontend\models\VerifyEmailForm;
+
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\web\BadRequestHttpException;
@@ -11,10 +10,14 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use common\models\LoginForm;
+use common\models\TinyUrl;
+use frontend\models\ContactForm;
 use frontend\models\PasswordResetRequestForm;
+use frontend\models\ResendVerificationEmailForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
-use frontend\models\ContactForm;
+use frontend\models\VerifyEmailForm;
+
 
 /**
  * Site controller
@@ -88,13 +91,25 @@ class SiteController extends Controller
     {
         Yii::info(__METHOD__ . ' +' . __LINE__ . ' $url: ' . var_export($url, true));
 
-        $decodedUrl = base64_decode($url);
-        Yii::info(__METHOD__ . ' +' . __LINE__ . ' $decodedUrl: ' . var_export($decodedUrl, true));
-
-        if ($decodedUrl !== false) {
-            $redirectToUrl = $decodedUrl;
+        $tinyUrl = TinyUrl::findOne($url);
+        Yii::info(__METHOD__ . ' +' . __LINE__ . ' $tinyUrl: ' . var_export($tinyUrl, true));
+        if (!empty($tinyUrl)) {
+            $redirectToUrl = $tinyUrl->url;
         } else {
-            $redirectToUrl = $url;
+            $tinyUrl2 = TinyUrl::find()->where(['key' => $url])->one();
+            Yii::info(__METHOD__ . ' +' . __LINE__ . ' $tinyUrl2: ' . var_export($tinyUrl2, true));
+            if (!empty($tinyUrl2)) {
+                $redirectToUrl = $tinyUrl2->url;
+            } else {
+                $decodedUrl = base64_decode($url);
+                Yii::info(__METHOD__ . ' +' . __LINE__ . ' $decodedUrl: ' . var_export($decodedUrl, true));
+
+                if ($decodedUrl !== false) {
+                    $redirectToUrl = $decodedUrl;
+                } else {
+                    $redirectToUrl = $url;
+                }
+            }
         }
         Yii::info(__METHOD__ . ' +' . __LINE__ . ' $redirectToUrl: ' . var_export($redirectToUrl, true));
 
