@@ -87,41 +87,46 @@ class SiteController extends Controller
      * @param string $url
      * @return mixed
      */
-    public function actionTo($url)
+    public function actionTo($url): string
     {
         $request = Yii::$app->request;
 
         Yii::info(__METHOD__ . ' +' . __LINE__ . ' $url: ' . var_export($url, true));
 
-        $tinyUrl = TinyUrl::findOne($url);
-        Yii::info(__METHOD__ . ' +' . __LINE__ . ' $tinyUrl: ' . var_export($tinyUrl, true));
-        if (!empty($tinyUrl)) {
-            $redirectToUrl = $tinyUrl->url;
-        } else {
-            $tinyUrl2 = TinyUrl::find()->where(['key' => $url])->one();
-            Yii::info(__METHOD__ . ' +' . __LINE__ . ' $tinyUrl2: ' . var_export($tinyUrl2, true));
-            if (!empty($tinyUrl2)) {
-                $redirectToUrl = $tinyUrl2->url;
-            } else {
-                $decodedUrl = base64_decode($url);
-                Yii::info(__METHOD__ . ' +' . __LINE__ . ' $decodedUrl: ' . var_export($decodedUrl, true));
+        $redirectToUrl = null;
 
-                if ($decodedUrl !== false) {
-                    $redirectToUrl = $decodedUrl;
-                } else {
-                    $redirectToUrl = $url;
-                }
+        if (is_numeric($url)) {
+            $tinyUrl = TinyUrl::findOne(intval($url));
+            Yii::info(__METHOD__ . ' +' . __LINE__ . ' $tinyUrl (by ID): ' . var_export($tinyUrl, true));
+            if (!empty($tinyUrl)) {
+                $redirectToUrl = $tinyUrl->url;
             }
         }
+
+        if ($redirectToUrl === null) {
+            $tinyUrl = TinyUrl::find()->where(['key' => $url])->one();
+            Yii::info(__METHOD__ . ' +' . __LINE__ . ' $tinyUrl (by key): ' . var_export($tinyUrl, true));
+            if (!empty($tinyUrl)) {
+                $redirectToUrl = $tinyUrl->url;
+            }
+        }
+
+        if ($redirectToUrl === null) {
+            $decodedUrl = base64_decode($url);
+            Yii::info(__METHOD__ . ' +' . __LINE__ . ' $decodedUrl: ' . var_export($decodedUrl, true));
+            if ($decodedUrl !== false) {
+                $redirectToUrl = $decodedUrl;
+            } else {
+                $redirectToUrl = $url;
+            }
+        }
+
         Yii::info(__METHOD__ . ' +' . __LINE__ . ' $redirectToUrl: ' . var_export($redirectToUrl, true));
 
-        $redirectTime = Yii::$app->params['redirect.time'];
-        if (empty($redirectTime)) {
-            $redirectTime = 5; // set default redirect time in case if params doesn't have it
-        }
+        $redirectTime = Yii::$app->params['redirect.time'] ?? 5;
+
         $s = $request->get('s');
         if (isset($s) && is_numeric($s) && intval($s) == $s) {
-            // The 's' parameter is set and it has an integer value
             $redirectTime = intval($s);
         }
 
