@@ -89,6 +89,8 @@ class SiteController extends Controller
      */
     public function actionTo($url)
     {
+        $request = Yii::$app->request;
+
         Yii::info(__METHOD__ . ' +' . __LINE__ . ' $url: ' . var_export($url, true));
 
         $tinyUrl = TinyUrl::findOne($url);
@@ -116,6 +118,11 @@ class SiteController extends Controller
         $redirectTime = Yii::$app->params['redirect.time'];
         if (empty($redirectTime)) {
             $redirectTime = 5; // set default redirect time in case if params doesn't have it
+        }
+        $s = $request->get('s');
+        if (isset($s) && is_numeric($s) && intval($s) == $s) {
+            // The 's' parameter is set and it has an integer value
+            $redirectTime = intval($s);
         }
 
         return $this->render('to', [
