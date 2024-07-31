@@ -113,9 +113,14 @@ class SiteController extends Controller
         }
         Yii::info(__METHOD__ . ' +' . __LINE__ . ' $redirectToUrl: ' . var_export($redirectToUrl, true));
 
+        $redirectTime = Yii::$app->params['redirect.time'];
+        if (empty($redirectTime)) {
+            $redirectTime = 5; // set default redirect time in case if params doesn't have it
+        }
+
         return $this->render('to', [
             'url' => $redirectToUrl,
-            'seconds' => 15,
+            'seconds' => $redirectTime,
         ]);
     }
 
