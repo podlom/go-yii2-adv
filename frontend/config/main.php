@@ -1,4 +1,5 @@
 <?php
+
 $params = array_merge(
     require __DIR__ . '/../../common/config/params.php',
     require __DIR__ . '/../../common/config/params-local.php',
@@ -43,6 +44,10 @@ return [
                 '/' => 'site/index',
                 'to' => 'site/to',
                 'to/<url:[\w]+>' => 'site/to',
+                'log-banner-click' => 'site/log-banner-click',
+                'tiny-url/create' => 'tiny-url/create',
+                'tiny-url' => 'tiny-url/index',
+
             ],
         ],
     ],

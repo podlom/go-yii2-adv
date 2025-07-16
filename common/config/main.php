@@ -9,5 +9,11 @@ return [
         'cache' => [
             'class' => \yii\caching\FileCache::class,
         ],
+        'formatter' => [
+            'class' => 'yii\i18n\Formatter',
+            'defaultTimeZone' => 'Europe/Kyiv',
+            'timeZone' => 'Europe/Kyiv', // для користувача
+        ],
     ],
+    'timeZone' => 'Europe/Kyiv',
 ];

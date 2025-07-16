@@ -2,15 +2,17 @@
 
 namespace frontend\controllers;
 
-
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
+use yii\web\Response;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+use common\models\BannerClickLog;
 use common\models\LoginForm;
 use common\models\TinyUrl;
+use common\models\UrlRedirectLog;
 use frontend\models\ContactForm;
 use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResendVerificationEmailForm;
@@ -18,12 +20,20 @@ use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\VerifyEmailForm;
 
-
 /**
  * Site controller
  */
 class SiteController extends Controller
 {
+    public function beforeAction($action)
+    {
+        if ($action->id === 'log-banner-click') {
+            Yii::$app->request->enableCsrfValidation = false;
+        }
+
+        return parent::beforeAction($action);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -87,35 +97,80 @@ class SiteController extends Controller
      * @param string $url
      * @return mixed
      */
-    public function actionTo($url)
+    public function actionTo($url): string
     {
+        $request = Yii::$app->request;
+        $ip = $request->userIP ?? 'unknown';
+        $userAgent = $request->userAgent ?? 'unknown';
+
         Yii::info(__METHOD__ . ' +' . __LINE__ . ' $url: ' . var_export($url, true));
+        Yii::info(__METHOD__ . ' +' . __LINE__ . ' $ip: ' . var_export($ip, true));
+        Yii::info(__METHOD__ . ' +' . __LINE__ . ' browser: ' . var_export($userAgent, true));
 
-        $tinyUrl = TinyUrl::findOne($url);
-        Yii::info(__METHOD__ . ' +' . __LINE__ . ' $tinyUrl: ' . var_export($tinyUrl, true));
-        if (!empty($tinyUrl)) {
-            $redirectToUrl = $tinyUrl->url;
-        } else {
-            $tinyUrl2 = TinyUrl::find()->where(['key' => $url])->one();
-            Yii::info(__METHOD__ . ' +' . __LINE__ . ' $tinyUrl2: ' . var_export($tinyUrl2, true));
-            if (!empty($tinyUrl2)) {
-                $redirectToUrl = $tinyUrl2->url;
-            } else {
-                $decodedUrl = base64_decode($url);
-                Yii::info(__METHOD__ . ' +' . __LINE__ . ' $decodedUrl: ' . var_export($decodedUrl, true));
+        $redirectToUrl = null;
 
-                if ($decodedUrl !== false) {
-                    $redirectToUrl = $decodedUrl;
-                } else {
-                    $redirectToUrl = $url;
-                }
+        if (is_numeric($url)) {
+            $tinyUrl = TinyUrl::findOne(intval($url));
+            Yii::info(__METHOD__ . ' +' . __LINE__ . ' $tinyUrl (by ID): ' . var_export($tinyUrl, true));
+            if (!empty($tinyUrl)) {
+                $redirectToUrl = $tinyUrl->url;
             }
         }
+
+        if ($redirectToUrl === null) {
+            $tinyUrl = TinyUrl::find()->where(['key' => $url])->one();
+            Yii::info(__METHOD__ . ' +' . __LINE__ . ' $tinyUrl (by key): ' . var_export($tinyUrl, true));
+            if (!empty($tinyUrl)) {
+                $redirectToUrl = $tinyUrl->url;
+            }
+        }
+
+        if ($redirectToUrl === null) {
+            $decodedUrl = base64_decode($url);
+            Yii::info(__METHOD__ . ' +' . __LINE__ . ' $decodedUrl: ' . var_export($decodedUrl, true));
+            if ($decodedUrl !== false) {
+                $redirectToUrl = $decodedUrl;
+            } else {
+                $redirectToUrl = $url;
+            }
+        }
+
         Yii::info(__METHOD__ . ' +' . __LINE__ . ' $redirectToUrl: ' . var_export($redirectToUrl, true));
+
+        $redirectTime = Yii::$app->params['redirect.time'] ?? 5;
+
+        $s = $request->get('s');
+        if (isset($s) && is_numeric($s) && intval($s) == $s) {
+            $redirectTime = intval($s);
+        }
+
+        // Отримати геодані через Symfony-сервіс
+        $geoInfo = [];
+        try {
+            $geoInfo = json_decode(file_get_contents("https://ip.shkodenko.com/ip-info?ipAddress={$ip}&key=hb3kl9XB5D31uQny"), true);
+        } catch (\Throwable $e) {
+            Yii::warning('Failed to fetch geo info: ' . $e->getMessage());
+        }
+        Yii::info(__METHOD__ . ' +' . __LINE__ . ' $geoInfo: ' . var_export($geoInfo, true));
+
+        // Записати лог
+        $log = new UrlRedirectLog();
+        $log->url = $redirectToUrl;
+        $log->ip = $ip;
+        $log->country = $geoInfo['country'] ?? null;
+        $log->city = $geoInfo['city'] ?? null;
+        $log->isp = $geoInfo['isp'] ?? null;
+        $log->user_agent = $userAgent;
+        $log->created_at = date('Y-m-d H:i:s');
+        $log->save();
+        //
+        if (!$log->save()) {
+            Yii::error('UrlRedirectLog save error: ' . var_export($log->getErrors(), true));
+        }
 
         return $this->render('to', [
             'url' => $redirectToUrl,
-            'seconds' => 15,
+            'seconds' => $redirectTime,
         ]);
     }
 
@@ -295,6 +350,57 @@ class SiteController extends Controller
 
         return $this->render('resendVerificationEmail', [
             'model' => $model
+        ]);
+    }
+
+    public function actionLogBannerClick(): Response
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $request = Yii::$app->request;
+
+        $allowedKey = Yii::$app->params['bannerClick.key'] ?? null;
+
+        $key = $request->post('key');
+
+        if (empty($allowedKey) || $key !== $allowedKey) {
+            return $this->asJson([
+                'error' => 1,
+                'message' => 'Invalid or missing key',
+            ]);
+        }
+
+        $ip = $request->post('ip');
+
+        // Отримати геодані через Symfony-сервіс
+        $geoInfo = [];
+        try {
+            $geoInfo = json_decode(file_get_contents("https://ip.shkodenko.com/ip-info?ipAddress={$ip}&key=hb3kl9XB5D31uQny"), true);
+        } catch (\Throwable $e) {
+            Yii::warning('Failed to fetch geo info: ' . $e->getMessage());
+        }
+        Yii::info(__METHOD__ . ' +' . __LINE__ . ' $geoInfo: ' . var_export($geoInfo, true));
+
+        $model = new BannerClickLog([
+            'url' => $request->post('url'),
+            'ip' => $ip,
+            'country' => $geoInfo['country'] ?? null,
+            'city' => $geoInfo['city'] ?? null,
+            'isp' => $geoInfo['isp'] ?? null,
+            'user_agent' => $request->post('user_agent'),
+            'network' => $request->post('network'),
+            'lang' => $request->post('lang', 'en'),
+            'created_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        if ($model->save()) {
+            return $this->asJson(['success' => true]);
+        }
+
+        return $this->asJson([
+            'error' => 2,
+            'message' => 'Validation failed',
+            'details' => $model->getErrors(),
         ]);
     }
 }
