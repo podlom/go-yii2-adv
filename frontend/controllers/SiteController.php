@@ -145,7 +145,6 @@ class SiteController extends Controller
             }
         }
 
-/* >>>>>>> 70edd4c1624347379ba73a66b5419530ba9e04c7
         if ($redirectToUrl === null) {
             $decodedUrl = base64_decode($url);
             Yii::info(__METHOD__ . ' +' . __LINE__ . ' $decodedUrl: ' . var_export($decodedUrl, true));
@@ -165,7 +164,7 @@ class SiteController extends Controller
             $redirectTime = intval($s);
         }
 
-<<<<<<< HEAD */
+/*
         // Отримати геодані через Symfony-сервіс
         $geoInfo = [];
         try {
@@ -175,7 +174,6 @@ class SiteController extends Controller
         }
         Yii::info(__METHOD__ . ' +' . __LINE__ . ' $geoInfo: ' . var_export($geoInfo, true));
 
-        // Записати лог
         $log = new UrlRedirectLog();
         $log->url = $redirectToUrl;
         $log->ip = $ip;
@@ -185,13 +183,11 @@ class SiteController extends Controller
         $log->user_agent = $userAgent;
         $log->created_at = date('Y-m-d H:i:s');
         $log->save();
-        //
         if (!$log->save()) {
             Yii::error('UrlRedirectLog save error: ' . var_export($log->getErrors(), true));
         }
+*/
 
-/* =======
->>>>>>> 70edd4c1624347379ba73a66b5419530ba9e04c7 */
         return $this->render('to', [
             'url' => $redirectToUrl,
             'seconds' => $redirectTime,
@@ -387,7 +383,7 @@ class SiteController extends Controller
 
         $key = $request->post('key');
 
-        if (empty($allowedKey) || $key !== $allowedKey) {
+        if (empty($allowedKey) || $key != $allowedKey) {
             return $this->asJson([
                 'error' => 1,
                 'message' => 'Invalid or missing key',
@@ -399,7 +395,7 @@ class SiteController extends Controller
         // Отримати геодані через Symfony-сервіс
         $geoInfo = [];
         try {
-            $geoInfo = json_decode(file_get_contents("https://ip.shkodenko.com/ip-info?ipAddress={$ip}&key=hb3kl9XB5D31uQny"), true);
+            $geoInfo = json_decode(file_get_contents("https://ip.shkodenko.com/ip-info?ipAddress={$ip}&key={$allowedKey}"), true);
         } catch (\Throwable $e) {
             Yii::warning('Failed to fetch geo info: ' . $e->getMessage());
         }
