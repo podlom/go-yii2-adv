@@ -47,6 +47,7 @@ return [
                 'log-banner-click' => 'site/log-banner-click',
                 'tiny-url/create' => 'tiny-url/create',
                 'tiny-url' => 'tiny-url/index',
+                'url-statistics' => 'url-statistics/index',
 
             ],
         ],
