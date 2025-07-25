@@ -125,6 +125,27 @@ class SiteController extends Controller
             }
         }
 
+/* <<<<<<< HEAD
+======= */
+        $redirectToUrl = null;
+
+        if (is_numeric($url)) {
+            $tinyUrl = TinyUrl::findOne(intval($url));
+            Yii::info(__METHOD__ . ' +' . __LINE__ . ' $tinyUrl (by ID): ' . var_export($tinyUrl, true));
+            if (!empty($tinyUrl)) {
+                $redirectToUrl = $tinyUrl->url;
+            }
+        }
+
+        if ($redirectToUrl === null) {
+            $tinyUrl = TinyUrl::find()->where(['key' => $url])->one();
+            Yii::info(__METHOD__ . ' +' . __LINE__ . ' $tinyUrl (by key): ' . var_export($tinyUrl, true));
+            if (!empty($tinyUrl)) {
+                $redirectToUrl = $tinyUrl->url;
+            }
+        }
+
+/* >>>>>>> 70edd4c1624347379ba73a66b5419530ba9e04c7
         if ($redirectToUrl === null) {
             $decodedUrl = base64_decode($url);
             Yii::info(__METHOD__ . ' +' . __LINE__ . ' $decodedUrl: ' . var_export($decodedUrl, true));
@@ -144,6 +165,7 @@ class SiteController extends Controller
             $redirectTime = intval($s);
         }
 
+<<<<<<< HEAD */
         // Отримати геодані через Symfony-сервіс
         $geoInfo = [];
         try {
@@ -168,6 +190,8 @@ class SiteController extends Controller
             Yii::error('UrlRedirectLog save error: ' . var_export($log->getErrors(), true));
         }
 
+/* =======
+>>>>>>> 70edd4c1624347379ba73a66b5419530ba9e04c7 */
         return $this->render('to', [
             'url' => $redirectToUrl,
             'seconds' => $redirectTime,
