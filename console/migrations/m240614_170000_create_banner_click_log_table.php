@@ -4,7 +4,7 @@ use yii\db\Migration;
 
 class m240614_170000_create_banner_click_log_table extends Migration
 {
-    public function safeUp()
+    public function safeUp(): void
     {
         $this->createTable('{{%banner_click_log}}', [
             'id' => $this->primaryKey(),
@@ -20,7 +20,7 @@ class m240614_170000_create_banner_click_log_table extends Migration
         ]);
     }
 
-    public function safeDown()
+    public function safeDown(): void
     {
         $this->dropTable('{{%banner_click_log}}');
     }

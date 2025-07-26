@@ -174,7 +174,7 @@ class User extends ActiveRecord implements IdentityInterface
      *
      * @param string $password
      */
-    public function setPassword($password)
+    public function setPassword($password): void
     {
         $this->password_hash = Yii::$app->security->generatePasswordHash($password);
     }
@@ -182,7 +182,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * Generates "remember me" authentication key
      */
-    public function generateAuthKey()
+    public function generateAuthKey(): void
     {
         $this->auth_key = Yii::$app->security->generateRandomString();
     }
@@ -190,7 +190,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * Generates new password reset token
      */
-    public function generatePasswordResetToken()
+    public function generatePasswordResetToken(): void
     {
         $this->password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
     }
@@ -198,7 +198,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * Generates new token for email verification
      */
-    public function generateEmailVerificationToken()
+    public function generateEmailVerificationToken(): void
     {
         $this->verification_token = Yii::$app->security->generateRandomString() . '_' . time();
     }
@@ -206,7 +206,7 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * Removes password reset token
      */
-    public function removePasswordResetToken()
+    public function removePasswordResetToken(): void
     {
         $this->password_reset_token = null;
     }

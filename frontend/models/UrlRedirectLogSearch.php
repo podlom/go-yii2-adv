@@ -8,7 +8,7 @@ use yii\data\ArrayDataProvider;
 
 class UrlRedirectLogSearch extends Model
 {
-    public function search()
+    public function search(): ArrayDataProvider
     {
         $rows = Yii::$app->db->createCommand("
             SELECT url, COUNT(*) as cnt_url

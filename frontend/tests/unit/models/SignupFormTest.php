@@ -2,18 +2,22 @@
 
 namespace frontend\tests\unit\models;
 
+use Codeception\Test\Unit;
+use common\models\User;
+use Yii;
+use frontend\tests\UnitTester;
 use common\fixtures\UserFixture;
 use frontend\models\SignupForm;
 
-class SignupFormTest extends \Codeception\Test\Unit
+class SignupFormTest extends Unit
 {
     /**
-     * @var \frontend\tests\UnitTester
+     * @var UnitTester
      */
     protected $tester;
 
 
-    public function _before()
+    public function _before(): void
     {
         $this->tester->haveFixtures([
             'user' => [
@@ -23,7 +27,7 @@ class SignupFormTest extends \Codeception\Test\Unit
         ]);
     }
 
-    public function testCorrectSignup()
+    public function testCorrectSignup(): void
     {
         $model = new SignupForm([
             'username' => 'some_username',
@@ -34,11 +38,11 @@ class SignupFormTest extends \Codeception\Test\Unit
         $user = $model->signup();
         verify($user)->notEmpty();
 
-        /** @var \common\models\User $user */
+        /** @var User $user */
         $user = $this->tester->grabRecord('common\models\User', [
             'username' => 'some_username',
             'email' => 'some_email@example.com',
-            'status' => \common\models\User::STATUS_INACTIVE
+            'status' => User::STATUS_INACTIVE
         ]);
 
         $this->tester->seeEmailIsSent();
@@ -47,12 +51,12 @@ class SignupFormTest extends \Codeception\Test\Unit
 
         verify($mail)->instanceOf('yii\mail\MessageInterface');
         verify($mail->getTo())->arrayHasKey('some_email@example.com');
-        verify($mail->getFrom())->arrayHasKey(\Yii::$app->params['supportEmail']);
-        verify($mail->getSubject())->equals('Account registration at ' . \Yii::$app->name);
+        verify($mail->getFrom())->arrayHasKey(Yii::$app->params['supportEmail']);
+        verify($mail->getSubject())->equals('Account registration at ' . Yii::$app->name);
         verify($mail->toString())->stringContainsString($user->verification_token);
     }
 
-    public function testNotCorrectSignup()
+    public function testNotCorrectSignup(): void
     {
         $model = new SignupForm([
             'username' => 'troy.becker',

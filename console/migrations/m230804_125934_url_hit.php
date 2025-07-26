@@ -13,36 +13,31 @@ class m230804_125934_url_hit extends Migration
     /**
      * {@inheritdoc}
      */
-    public function safeUp()
+    public function safeUp(): void
     {
         $tables = Yii::$app->db->schema->getTableNames();
         $dbType = $this->db->driverName;
         $tableOptions_mysql = "CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB";
-        $tableOptions_mssql = "";
-        $tableOptions_pgsql = "";
-        $tableOptions_sqlite = "";
         /* MYSQL */
-        if (!in_array(self::TABLE, $tables))  {
-            if ($dbType == "mysql") {
-                $this->createTable('{{%'. self::TABLE . '}}', [
-                    'id' => 'INT(11) UNSIGNED NOT NULL AUTO_INCREMENT',
-                    0 => 'PRIMARY KEY (`id`)',
-                    'request_url' => 'VARCHAR(255) NOT NULL',
-                    'url_id' => 'INT(11) UNSIGNED DEFAULT NULL',
-                    'created_at' => 'INT(11) NOT NULL',
-                    'updated_at' => 'INT(11) NOT NULL',
-                    'user_ip' => 'VARCHAR(255) NOT NULL',
-                    'user_id' => 'INT(11) NULL',
-                    'server_info' => 'TEXT NOT NULL',
-                ], $tableOptions_mysql);
-            }
+        if (!in_array(self::TABLE, $tables) && $dbType == "mysql")  {
+            $this->createTable('{{%'. self::TABLE . '}}', [
+                'id' => 'INT(11) UNSIGNED NOT NULL AUTO_INCREMENT',
+                0 => 'PRIMARY KEY (`id`)',
+                'request_url' => 'VARCHAR(255) NOT NULL',
+                'url_id' => 'INT(11) UNSIGNED DEFAULT NULL',
+                'created_at' => 'INT(11) NOT NULL',
+                'updated_at' => 'INT(11) NOT NULL',
+                'user_ip' => 'VARCHAR(255) NOT NULL',
+                'user_id' => 'INT(11) NULL',
+                'server_info' => 'TEXT NOT NULL',
+            ], $tableOptions_mysql);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function safeDown()
+    public function safeDown(): void
     {
         $this->execute('SET foreign_key_checks = 0');
         $this->execute('DROP TABLE IF EXISTS `' . self::TABLE . '`');

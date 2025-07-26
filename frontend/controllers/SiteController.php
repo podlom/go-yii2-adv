@@ -2,6 +2,9 @@
 
 namespace frontend\controllers;
 
+use yii\web\ErrorAction;
+use yii\captcha\CaptchaAction;
+use Throwable;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\web\BadRequestHttpException;
@@ -72,10 +75,10 @@ class SiteController extends Controller
     {
         return [
             'error' => [
-                'class' => \yii\web\ErrorAction::class,
+                'class' => ErrorAction::class,
             ],
             'captcha' => [
-                'class' => \yii\captcha\CaptchaAction::class,
+                'class' => CaptchaAction::class,
                 'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
             ],
         ];
@@ -95,7 +98,6 @@ class SiteController extends Controller
      * Displays to page.
      *
      * @param string $url
-     * @return mixed
      */
     public function actionTo($url): string
     {
@@ -148,11 +150,7 @@ class SiteController extends Controller
         if ($redirectToUrl === null) {
             $decodedUrl = base64_decode($url);
             Yii::info(__METHOD__ . ' +' . __LINE__ . ' $decodedUrl: ' . var_export($decodedUrl, true));
-            if ($decodedUrl !== false) {
-                $redirectToUrl = $decodedUrl;
-            } else {
-                $redirectToUrl = $url;
-            }
+            $redirectToUrl = $decodedUrl !== false ? $decodedUrl : $url;
         }
 
         Yii::info(__METHOD__ . ' +' . __LINE__ . ' $redirectToUrl: ' . var_export($redirectToUrl, true));
@@ -334,7 +332,7 @@ class SiteController extends Controller
      *
      * @param string $token
      * @throws BadRequestHttpException
-     * @return yii\web\Response
+     * @return Response
      */
     public function actionVerifyEmail($token)
     {
@@ -396,7 +394,7 @@ class SiteController extends Controller
         $geoInfo = [];
         try {
             $geoInfo = json_decode(file_get_contents("https://ip.shkodenko.com/ip-info?ipAddress={$ip}&key={$allowedKey}"), true);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Yii::warning('Failed to fetch geo info: ' . $e->getMessage());
         }
         Yii::info(__METHOD__ . ' +' . __LINE__ . ' $geoInfo: ' . var_export($geoInfo, true));

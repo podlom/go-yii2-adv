@@ -3,6 +3,7 @@
 namespace common\models;
 
 
+use yii\db\ActiveRecord;
 use Yii;
 
 
@@ -18,7 +19,7 @@ use Yii;
  * @property string $comment
  * @property int $status
  */
-class TinyUrl extends \yii\db\ActiveRecord
+class TinyUrl extends ActiveRecord
 {
     /**
      * {@inheritdoc}

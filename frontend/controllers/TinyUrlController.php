@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use yii\data\ActiveDataProvider;
 use Yii;
 use yii\web\Controller;
 use yii\filters\AccessControl;
@@ -50,18 +51,18 @@ class TinyUrlController extends Controller
 
     public function actionIndex()
     {
-        $query = \common\models\TinyUrl::find()
+        $query = TinyUrl::find()
             ->where(['user_id' => Yii::$app->user->id]) // тільки свої URL
             ->orderBy(['created_at' => SORT_DESC]);
 
-        $dataProvider = new \yii\data\ActiveDataProvider([
+        $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
                 'pageSize' => 20,
             ],
         ]);
 
-        $model = new \common\models\TinyUrl();
+        $model = new TinyUrl();
 
         if ($model->load(Yii::$app->request->post())) {
             $model->created_at = time();

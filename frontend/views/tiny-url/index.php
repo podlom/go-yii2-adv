@@ -52,13 +52,13 @@ $this->title = 'Мої Tiny URLs';
             ],
             [
                 'attribute' => 'created_at',
-                'value' => function ($model) {
+                'value' => function ($model): string {
                     return date('d.m.Y H:i', $model->created_at);
                 }
             ],
             [
                 'attribute' => 'status',
-                'value' => function ($model) {
+                'value' => function ($model): string {
                     return $model->status === 1 ? 'Активний' : 'Неактивний';
                 }
             ],

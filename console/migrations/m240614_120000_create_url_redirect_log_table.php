@@ -4,7 +4,7 @@ use yii\db\Migration;
 
 class m240614_120000_create_url_redirect_log_table extends Migration
 {
-    public function safeUp()
+    public function safeUp(): void
     {
         $this->createTable('{{%url_redirect_log}}', [
             'id' => $this->primaryKey(),
@@ -18,7 +18,7 @@ class m240614_120000_create_url_redirect_log_table extends Migration
         ]);
     }
 
-    public function safeDown()
+    public function safeDown(): void
     {
         $this->dropTable('{{%url_redirect_log}}');
     }

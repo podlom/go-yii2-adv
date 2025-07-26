@@ -2,6 +2,10 @@
 
 namespace frontend\tests;
 
+use Codeception\Actor;
+use frontend\tests\_generated\FunctionalTesterActions;
+use Codeception\Lib\Friend;
+
 /**
  * Inherited Methods
  * @method void wantToTest($text)
@@ -13,21 +17,21 @@ namespace frontend\tests;
  * @method void am($role)
  * @method void lookForwardTo($achieveValue)
  * @method void comment($description)
- * @method \Codeception\Lib\Friend haveFriend($name, $actorClass = NULL)
+ * @method Friend haveFriend($name, $actorClass = null)
  *
  * @SuppressWarnings(PHPMD)
  */
-class FunctionalTester extends \Codeception\Actor
+class FunctionalTester extends Actor
 {
-    use _generated\FunctionalTesterActions;
+    use FunctionalTesterActions;
 
 
-    public function seeValidationError($message)
+    public function seeValidationError($message): void
     {
         $this->see($message, '.invalid-feedback');
     }
 
-    public function dontSeeValidationError($message)
+    public function dontSeeValidationError($message): void
     {
         $this->dontSee($message, '.invalid-feedback');
     }
