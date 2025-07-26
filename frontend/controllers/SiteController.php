@@ -127,8 +127,6 @@ class SiteController extends Controller
             }
         }
 
-/* <<<<<<< HEAD
-======= */
         $redirectToUrl = null;
 
         if (is_numeric($url)) {
@@ -162,11 +160,11 @@ class SiteController extends Controller
             $redirectTime = intval($s);
         }
 
-/*
         // Отримати геодані через Symfony-сервіс
         $geoInfo = [];
         try {
-            $geoInfo = json_decode(file_get_contents("https://ip.shkodenko.com/ip-info?ipAddress={$ip}&key=hb3kl9XB5D31uQny"), true);
+            $allowedKey = Yii::$app->params['bannerClick.key'] ?? null;
+            $geoInfo = json_decode(file_get_contents("https://ip.shkodenko.com/ip-info?ipAddress={$ip}&key={$allowedKey}"), true);
         } catch (\Throwable $e) {
             Yii::warning('Failed to fetch geo info: ' . $e->getMessage());
         }
@@ -180,11 +178,11 @@ class SiteController extends Controller
         $log->isp = $geoInfo['isp'] ?? null;
         $log->user_agent = $userAgent;
         $log->created_at = date('Y-m-d H:i:s');
-        $log->save();
-        if (!$log->save()) {
+        $isLogSaved = $log->save();
+
+        if (!$isLogSaved) {
             Yii::error('UrlRedirectLog save error: ' . var_export($log->getErrors(), true));
         }
-*/
 
         return $this->render('to', [
             'url' => $redirectToUrl,
@@ -331,8 +329,8 @@ class SiteController extends Controller
      * Verify email address
      *
      * @param string $token
-     * @throws BadRequestHttpException
      * @return Response
+     * @throws BadRequestHttpException
      */
     public function actionVerifyEmail($token)
     {
