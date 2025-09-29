@@ -6,9 +6,15 @@ use yii\grid\GridView;
 
 /** @var yii\web\View $this */
 /** @var yii\data\ActiveDataProvider $dataProvider */
+/** @var common\models\TinyUrlSearch $searchModel */
 /** @var common\models\TinyUrl $model */
 
-$this->title = 'Мої Tiny URLs';
+$this->title = 'My Tiny URLs';
+
+if (($m = current($dataProvider->getModels())) !== false) {
+    error_log('First row clicks_count = ' . var_export($m->getAttribute('clicks_count'), true));
+}
+
 ?>
 
 <div class="tiny-url-index">
@@ -42,13 +48,22 @@ $this->title = 'Мої Tiny URLs';
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
+        'filterModel'  => $searchModel,
         'columns' => [
             'id',
             'key',
             'url:url',
             [
-                'attribute' => 'comment',
-                'format' => 'ntext',
+                'attribute' => 'clicks_count',
+                'label' => 'Clicks',
+                'format' => 'text',
+                'value' => static function ($m) {
+                    if (empty($m->url)) return 'N/a';
+                    $v = $m->getAttribute('clicks_count');
+                    return $v === null ? '0' : (string)$v;
+                },
+                'contentOptions' => ['style' => 'text-align:right; white-space:nowrap;'],
+                'headerOptions'  => ['style' => 'text-align:right;'],
             ],
             [
                 'attribute' => 'created_at',

@@ -2,12 +2,13 @@
 
 namespace frontend\controllers;
 
-use yii\data\ActiveDataProvider;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
 use common\models\TinyUrl;
+use common\models\TinyUrlSearch;
 
 class TinyUrlController extends Controller
 {
@@ -51,16 +52,11 @@ class TinyUrlController extends Controller
 
     public function actionIndex()
     {
-        $query = TinyUrl::find()
-            ->where(['user_id' => Yii::$app->user->id]) // тільки свої URL
-            ->orderBy(['created_at' => SORT_DESC]);
+        $searchModel  = new TinyUrlSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-            'pagination' => [
-                'pageSize' => 20,
-            ],
-        ]);
+        // DEBUG ONCE: confirm the actual SQL has the LEFT JOIN on tiny_url_id
+        Yii::debug($dataProvider->query->createCommand()->rawSql, __METHOD__);
 
         $model = new TinyUrl();
 
@@ -78,7 +74,8 @@ class TinyUrlController extends Controller
 
         return $this->render('index', [
             'model' => $model,
-            'dataProvider' => $dataProvider,
+            'searchModel'  => $searchModel,
+            'dataProvider' => $dataProvider, // <-- this exact var passes to GridView
         ]);
     }
 

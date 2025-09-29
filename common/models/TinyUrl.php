@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace common\models;
 
-
+use common\models\TinyUrlQuery;
 use yii\db\ActiveRecord;
 use Yii;
-
 
 /**
  * This is the model class for table "tiny_url".
@@ -26,7 +27,13 @@ class TinyUrl extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'tiny_url';
+        return '{{%tiny_url}}';
+    }
+
+    // IMPORTANT: expose the virtual attribute to Yii
+    public function attributes(): array
+    {
+        return array_merge(parent::attributes(), ['clicks_count']);
     }
 
     /**
@@ -57,5 +64,24 @@ class TinyUrl extends ActiveRecord
             'comment' => Yii::t('app', 'Comment'),
             'status' => Yii::t('app', 'Status'),
         ];
+    }
+
+    // Optional convenience (per-row count; avoid in views to prevent N+1)
+    public function getClicksCount(): int
+    {
+        return (int) $this->getUrlRedirectLogs()->count();
+    }
+
+    public static function find(): TinyUrlQuery
+    {
+        /** @var TinyUrlQuery $q */
+        $q = new TinyUrlQuery(static::class);
+        return $q->alias('tu');
+    }
+
+    // Relation by URL (quick win for current schema)
+    public function getUrlRedirectLogs()
+    {
+        return $this->hasMany(UrlRedirectLog::class, ['tiny_url_id' => 'id']);
     }
 }
