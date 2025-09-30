@@ -45,7 +45,7 @@ return [
             'rules' => [
                 '/' => 'site/index',
                 'to' => 'site/to',
-                'to/<url:[\w]+>' => 'site/to',
+                'to/<url:[A-Za-z0-9\-_]+={0,2}>' => 'site/to',
                 'log-banner-click' => 'site/log-banner-click',
                 'tiny-url/create' => 'tiny-url/create',
                 'tiny-url' => 'tiny-url/index',

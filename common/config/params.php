@@ -8,4 +8,5 @@ return [
     'user.passwordResetTokenExpire' => 3600,
     'user.passwordMinLength' => 8,
     'redirect.time' => 5,
+    'app.urlPrefix' => 'https://go.shkodenko.com',
 ];

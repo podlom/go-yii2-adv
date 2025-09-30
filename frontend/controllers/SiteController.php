@@ -127,28 +127,16 @@ class SiteController extends Controller
             }
         }
 
-        $redirectToUrl = null;
-
-        if (is_numeric($url)) {
-            $tinyUrl = TinyUrl::findOne(intval($url));
-            Yii::info(__METHOD__ . ' +' . __LINE__ . ' $tinyUrl (by ID): ' . var_export($tinyUrl, true));
-            if (!empty($tinyUrl)) {
-                $redirectToUrl = $tinyUrl->url;
-            }
-        }
-
-        if ($redirectToUrl === null) {
-            $tinyUrl = TinyUrl::find()->where(['key' => $url])->one();
-            Yii::info(__METHOD__ . ' +' . __LINE__ . ' $tinyUrl (by key): ' . var_export($tinyUrl, true));
-            if (!empty($tinyUrl)) {
-                $redirectToUrl = $tinyUrl->url;
-            }
-        }
-
         if ($redirectToUrl === null) {
             $decodedUrl = base64_decode($url);
             Yii::info(__METHOD__ . ' +' . __LINE__ . ' $decodedUrl: ' . var_export($decodedUrl, true));
-            $redirectToUrl = $decodedUrl !== false ? $decodedUrl : $url;
+            $tinyUrl = TinyUrl::find()->where(['key' => $decodedUrl])->one();
+            Yii::info(__METHOD__ . ' +' . __LINE__ . ' $tinyUrl (by key): ' . var_export($tinyUrl, true));
+            if (!empty($tinyUrl)) {
+                $redirectToUrl = $tinyUrl->url;
+            } else {
+                $redirectToUrl = $decodedUrl !== false ? $decodedUrl : $url;
+            }
         }
 
         Yii::info(__METHOD__ . ' +' . __LINE__ . ' $redirectToUrl: ' . var_export($redirectToUrl, true));

@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\grid\GridView;
+use frontend\helpers\TinyHelper;
 
 /** @var yii\web\View $this */
 /** @var yii\data\ActiveDataProvider $dataProvider */
@@ -50,8 +51,26 @@ if (($m = current($dataProvider->getModels())) !== false) {
         'dataProvider' => $dataProvider,
         'filterModel'  => $searchModel,
         'columns' => [
-            'id',
-            'key',
+            [
+                'attribute' => 'id',
+                'format' => 'raw',
+                'value' => fn($model) =>
+                Html::a(
+                    $model->id,
+                    TinyHelper::getUrlToRedirect($model->id),
+                    ['target' => '_blank', 'rel' => 'noopener']
+                ),
+            ],
+            [
+                'attribute' => 'key',
+                'format' => 'raw',
+                'value' => fn($model) =>
+                Html::a(
+                    $model->key,
+                    TinyHelper::getUrlToRedirect($model->key, true),
+                    ['target' => '_blank', 'rel' => 'noopener']
+                ),
+            ],
             'url:url',
             [
                 'attribute' => 'clicks_count',
