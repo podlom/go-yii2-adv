@@ -43,6 +43,7 @@ return [
                 '/' => 'site/index',
                 'to' => 'site/to',
                 'to/<url:[\w]+>' => 'site/to',
+                'log-banner-click' => 'site/log-banner-click',
             ],
         ],
     ],

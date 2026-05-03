@@ -25,6 +25,15 @@ use frontend\models\VerifyEmailForm;
  */
 class SiteController extends Controller
 {
+    public function beforeAction($action)
+    {
+        if ($action->id === 'log-banner-click') {
+            Yii::$app->request->enableCsrfValidation = false;
+        }
+
+        return parent::beforeAction($action);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -355,7 +364,10 @@ class SiteController extends Controller
         $key = $request->post('key');
 
         if (empty($allowedKey) || $key !== $allowedKey) {
-            return ['error' => 1, 'message' => 'Invalid or missing key'];
+            return $this->asJson([
+                'error' => 1,
+                'message' => 'Invalid or missing key',
+            ]);
         }
 
         $ip = $request->post('ip');
@@ -381,10 +393,14 @@ class SiteController extends Controller
             'created_at' => date('Y-m-d H:i:s'),
         ]);
 
-        if (!$model->save()) {
-            return ['error' => 1, 'message' => 'DB save failed', 'details' => $model->getErrors()];
+        if ($model->save()) {
+            return $this->asJson(['success' => true]);
         }
 
-        return ['success' => 1];
+        return $this->asJson([
+            'error' => 2,
+            'message' => 'Validation failed',
+            'details' => $model->getErrors(),
+        ]);
     }
 }
