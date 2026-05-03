@@ -15,9 +15,8 @@ class LoginCest
      * Called in _before()
      * @see \Codeception\Module\Yii2::_before()
      * @see \Codeception\Module\Yii2::loadFixtures()
-     * @return array
      */
-    public function _fixtures()
+    public function _fixtures(): array
     {
         return [
             'user' => [
@@ -27,10 +26,7 @@ class LoginCest
         ];
     }
     
-    /**
-     * @param FunctionalTester $I
-     */
-    public function loginUser(FunctionalTester $I)
+    public function loginUser(FunctionalTester $I): void
     {
         $I->amOnRoute('/site/login');
         $I->fillField('Username', 'erau');

@@ -1,0 +1,102 @@
+<?php
+
+use yii\helpers\Html;
+use yii\widgets\ActiveForm;
+use yii\grid\GridView;
+use frontend\helpers\TinyHelper;
+
+/** @var yii\web\View $this */
+/** @var yii\data\ActiveDataProvider $dataProvider */
+/** @var common\models\TinyUrlSearch $searchModel */
+/** @var common\models\TinyUrl $model */
+
+$this->title = 'My Tiny URLs';
+
+if (($m = current($dataProvider->getModels())) !== false) {
+    error_log('First row clicks_count = ' . var_export($m->getAttribute('clicks_count'), true));
+}
+
+?>
+
+<div class="tiny-url-index">
+    <h1><?= Html::encode($this->title) ?></h1>
+
+    <?php if (Yii::$app->session->hasFlash('success')): ?>
+        <div class="alert alert-success">
+            <?= Yii::$app->session->getFlash('success') ?>
+        </div>
+    <?php endif; ?>
+
+    <div class="well">
+        <h4>Додати новий запис</h4>
+
+        <?php $form = ActiveForm::begin(); ?>
+
+        <div class="row">
+            <div class="col-md-3"><?= $form->field($model, 'key')->textInput(['maxlength' => true]) ?></div>
+            <div class="col-md-5"><?= $form->field($model, 'url')->textInput(['maxlength' => true]) ?></div>
+            <div class="col-md-4"><?= $form->field($model, 'comment')->textInput(['maxlength' => true]) ?></div>
+        </div>
+
+        <div class="form-group">
+            <?= Html::submitButton('Додати', ['class' => 'btn btn-success']) ?>
+        </div>
+
+        <?php ActiveForm::end(); ?>
+    </div>
+
+    <h4 class="mt-4">Список записів</h4>
+
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'filterModel'  => $searchModel,
+        'columns' => [
+            [
+                'attribute' => 'id',
+                'format' => 'raw',
+                'value' => fn($model) =>
+                Html::a(
+                    $model->id,
+                    TinyHelper::getUrlToRedirect($model->id),
+                    ['target' => '_blank', 'rel' => 'noopener']
+                ),
+            ],
+            [
+                'attribute' => 'key',
+                'format' => 'raw',
+                'value' => fn($model) =>
+                Html::a(
+                    $model->key,
+                    TinyHelper::getUrlToRedirect($model->key, true),
+                    ['target' => '_blank', 'rel' => 'noopener']
+                ),
+            ],
+            'url:url',
+            [
+                'attribute' => 'clicks_count',
+                'label' => 'Clicks',
+                'format' => 'text',
+                'value' => static function ($m) {
+                    if (empty($m->url)) return 'N/a';
+                    $v = $m->getAttribute('clicks_count');
+                    return $v === null ? '0' : (string)$v;
+                },
+                'contentOptions' => ['style' => 'text-align:right; white-space:nowrap;'],
+                'headerOptions'  => ['style' => 'text-align:right;'],
+            ],
+            [
+                'attribute' => 'created_at',
+                'value' => function ($model): string {
+                    return date('d.m.Y H:i', $model->created_at);
+                }
+            ],
+            [
+                'attribute' => 'status',
+                'value' => function ($model): string {
+                    return $model->status === 1 ? 'Активний' : 'Неактивний';
+                }
+            ],
+        ],
+    ]); ?>
+</div>
+

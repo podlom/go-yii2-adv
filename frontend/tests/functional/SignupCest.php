@@ -2,6 +2,7 @@
 
 namespace frontend\tests\functional;
 
+use common\models\User;
 use frontend\tests\FunctionalTester;
 
 class SignupCest
@@ -9,12 +10,12 @@ class SignupCest
     protected $formId = '#form-signup';
 
 
-    public function _before(FunctionalTester $I)
+    public function _before(FunctionalTester $I): void
     {
         $I->amOnRoute('site/signup');
     }
 
-    public function signupWithEmptyFields(FunctionalTester $I)
+    public function signupWithEmptyFields(FunctionalTester $I): void
     {
         $I->see('Signup', 'h1');
         $I->see('Please fill out the following fields to signup:');
@@ -25,7 +26,7 @@ class SignupCest
 
     }
 
-    public function signupWithWrongEmail(FunctionalTester $I)
+    public function signupWithWrongEmail(FunctionalTester $I): void
     {
         $I->submitForm(
             $this->formId, [
@@ -39,7 +40,7 @@ class SignupCest
         $I->see('Email is not a valid email address.', '.invalid-feedback');
     }
 
-    public function signupSuccessfully(FunctionalTester $I)
+    public function signupSuccessfully(FunctionalTester $I): void
     {
         $I->submitForm($this->formId, [
             'SignupForm[username]' => 'tester',
@@ -50,7 +51,7 @@ class SignupCest
         $I->seeRecord('common\models\User', [
             'username' => 'tester',
             'email' => 'tester.email@example.com',
-            'status' => \common\models\User::STATUS_INACTIVE
+            'status' => User::STATUS_INACTIVE
         ]);
 
         $I->seeEmailIsSent();

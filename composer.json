@@ -14,7 +14,7 @@
     },
     "minimum-stability": "stable",
     "require": {
-        "php": ">=7.4.0",
+        "php": ">=8.1.0",
         "yiisoft/yii2": "~2.0.45",
         "yiisoft/yii2-bootstrap5": "~2.0.2",
         "yiisoft/yii2-symfonymailer": "~2.0.3",
@@ -31,7 +31,8 @@
         "codeception/module-yii2": "^1.1",
         "codeception/module-filesystem": "^3.0 || ^1.1",
         "codeception/verify": "^2.2",
-        "symfony/browser-kit": "^6.0 || >=2.7 <=4.2.4"
+        "symfony/browser-kit": "^6.0 || >=2.7 <=4.2.4",
+        "rector/rector": "^2.1"
     },
     "config": {
         "allow-plugins": {
@@ -41,6 +42,9 @@
         "fxp-asset": {
             "enabled": false
         }
+    },
+    "scripts": {
+        "rector": "vendor/bin/rector process"
     },
     "repositories": [
         {

@@ -4,11 +4,11 @@ use yii\db\Migration;
 
 
 /**
- * Class m220920_140146_tiny_url
+ * Class m230804_125934_url_hit
  */
-class m220920_140146_tiny_url extends Migration
+class m230804_125934_url_hit extends Migration
 {
-    const TABLE = 'tiny_url';
+    const TABLE = 'url_hit';
 
     /**
      * {@inheritdoc}
@@ -23,13 +23,13 @@ class m220920_140146_tiny_url extends Migration
             $this->createTable('{{%'. self::TABLE . '}}', [
                 'id' => 'INT(11) UNSIGNED NOT NULL AUTO_INCREMENT',
                 0 => 'PRIMARY KEY (`id`)',
-                'key' => 'VARCHAR(255) NOT NULL',
-                'url' => 'VARCHAR(255) NOT NULL',
+                'request_url' => 'VARCHAR(255) NOT NULL',
+                'url_id' => 'INT(11) UNSIGNED DEFAULT NULL',
                 'created_at' => 'INT(11) NOT NULL',
                 'updated_at' => 'INT(11) NOT NULL',
+                'user_ip' => 'VARCHAR(255) NOT NULL',
                 'user_id' => 'INT(11) NULL',
-                'comment' => 'TEXT NOT NULL',
-                'status' => 'SMALLINT(4) NOT NULL DEFAULT \'0\'',
+                'server_info' => 'TEXT NOT NULL',
             ], $tableOptions_mysql);
         }
     }
@@ -41,6 +41,21 @@ class m220920_140146_tiny_url extends Migration
     {
         $this->execute('SET foreign_key_checks = 0');
         $this->execute('DROP TABLE IF EXISTS `' . self::TABLE . '`');
-        $this->execute('SET foreign_key_checks = 1;');
+        $this->execute('SET foreign_key_checks = 1');
     }
+
+    /*
+    // Use up()/down() to run migration code without a transaction.
+    public function up()
+    {
+
+    }
+
+    public function down()
+    {
+        echo "m230804_125934_url_hit cannot be reverted.\n";
+
+        return false;
+    }
+    */
 }

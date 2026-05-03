@@ -3,6 +3,8 @@
 namespace frontend\tests\unit\models;
 
 
+use Yii;
+use frontend\tests\UnitTester;
 use Codeception\Test\Unit;
 use common\fixtures\UserFixture;
 use frontend\models\ResendVerificationEmailForm;
@@ -10,12 +12,12 @@ use frontend\models\ResendVerificationEmailForm;
 class ResendVerificationEmailFormTest extends Unit
 {
     /**
-     * @var \frontend\tests\UnitTester
+     * @var UnitTester
      */
     protected $tester;
 
 
-    public function _before()
+    public function _before(): void
     {
         $this->tester->haveFixtures([
             'user' => [
@@ -25,7 +27,7 @@ class ResendVerificationEmailFormTest extends Unit
         ]);
     }
 
-    public function testWrongEmailAddress()
+    public function testWrongEmailAddress(): void
     {
         $model = new ResendVerificationEmailForm();
         $model->attributes = [
@@ -37,7 +39,7 @@ class ResendVerificationEmailFormTest extends Unit
         verify($model->getFirstError('email'))->equals('There is no user with this email address.');
     }
 
-    public function testEmptyEmailAddress()
+    public function testEmptyEmailAddress(): void
     {
         $model = new ResendVerificationEmailForm();
         $model->attributes = [
@@ -49,7 +51,7 @@ class ResendVerificationEmailFormTest extends Unit
         verify($model->getFirstError('email'))->equals('Email cannot be blank.');
     }
 
-    public function testResendToActiveUser()
+    public function testResendToActiveUser(): void
     {
         $model = new ResendVerificationEmailForm();
         $model->attributes = [
@@ -61,7 +63,7 @@ class ResendVerificationEmailFormTest extends Unit
         verify($model->getFirstError('email'))->equals('There is no user with this email address.');
     }
 
-    public function testSuccessfullyResend()
+    public function testSuccessfullyResend(): void
     {
         $model = new ResendVerificationEmailForm();
         $model->attributes = [
@@ -78,8 +80,8 @@ class ResendVerificationEmailFormTest extends Unit
 
         verify($mail)->instanceOf('yii\mail\MessageInterface');
         verify($mail->getTo())->arrayHasKey('test@mail.com');
-        verify($mail->getFrom())->arrayHasKey(\Yii::$app->params['supportEmail']);
-        verify($mail->getSubject())->equals('Account registration at ' . \Yii::$app->name);
+        verify($mail->getFrom())->arrayHasKey(Yii::$app->params['supportEmail']);
+        verify($mail->getSubject())->equals('Account registration at ' . Yii::$app->name);
         verify($mail->toString())->stringContainsString('4ch0qbfhvWwkcuWqjN8SWRq72SOw1KYT_1548675330');
     }
 }

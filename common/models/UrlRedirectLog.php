@@ -3,6 +3,7 @@
 namespace common\models;
 
 use yii\db\ActiveRecord;
+
 class UrlRedirectLog extends ActiveRecord
 {
     public static function tableName(): string

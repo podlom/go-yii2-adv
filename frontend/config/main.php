@@ -1,4 +1,7 @@
 <?php
+
+use yii\log\FileTarget;
+
 $params = array_merge(
     require __DIR__ . '/../../common/config/params.php',
     require __DIR__ . '/../../common/config/params-local.php',
@@ -28,7 +31,7 @@ return [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
                 [
-                    'class' => \yii\log\FileTarget::class,
+                    'class' => FileTarget::class,
                     'levels' => ['error', 'warning'],
                 ],
             ],
@@ -41,9 +44,11 @@ return [
             'showScriptName' => false,
             'rules' => [
                 '/' => 'site/index',
-                'to' => 'site/to',
-                'to/<url:[\w]+>' => 'site/to',
+                'to/<url:[A-Za-z0-9\-_]+={0,2}>' => 'site/to',
                 'log-banner-click' => 'site/log-banner-click',
+                'tiny-url/create' => 'tiny-url/create',
+                'tiny-url' => 'tiny-url/index',
+                'url-statistics' => 'url-statistics/index',
             ],
         ],
     ],
