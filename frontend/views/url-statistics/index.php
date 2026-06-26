@@ -3,7 +3,7 @@
 use yii\grid\GridView;
 use yii\helpers\Html;
 
-$this->title = 'Статистика переходів по URL';
+$this->title = 'Статистика переходів по URL |' . Yii::$app->name;
 
 ?>
 
