@@ -7,7 +7,7 @@ use yii\widgets\ActiveForm;
 /** @var common\models\TinyUrl $model */
 /** @var yii\widgets\ActiveForm $form */
 
-$this->title = 'Додати новий Tiny URL';
+$this->title = 'Додати новий Tiny URL | ' . Yii::$app->name;
 ?>
 
 <div class="tiny-url-create">

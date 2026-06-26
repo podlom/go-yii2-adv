@@ -10,7 +10,7 @@ use frontend\helpers\TinyHelper;
 /** @var common\models\TinyUrlSearch $searchModel */
 /** @var common\models\TinyUrl $model */
 
-$this->title = 'My Tiny URLs';
+$this->title = 'My Tiny URLs | ' . Yii::$app->name;
 
 if (($m = current($dataProvider->getModels())) !== false) {
     error_log('First row clicks_count = ' . var_export($m->getAttribute('clicks_count'), true));
